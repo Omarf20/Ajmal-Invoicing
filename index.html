@@ -1,0 +1,916 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Ajmal Perfume — Tax Invoice Generator</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,800&family=Inter:wght@400;500;600;700&display=swap">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+  :root{
+    --app-bg:#f1eef7;
+    --paper:#ffffff;
+    --ink:#1f1c2e;
+    --ink-muted:#7d7891;
+    --rule:#e3e0ec;
+    --rule-strong:#c9c5db;
+    --accent:#2a2568;
+    --accent-ink:#181449;
+    --accent-soft:#e9e7f5;
+    --danger:#b3452f;
+    --danger-soft:#f7e6e1;
+    --chip-bg:#eeecf7;
+    --shadow: 0 1px 2px rgba(31,28,46,.06), 0 12px 32px -16px rgba(31,28,46,.28);
+    --focus: 0 0 0 3px var(--accent-soft);
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --app-bg:#15131f;
+      --ink:#ece9f7;
+      --ink-muted:#a29cbd;
+      --rule:#332e4c;
+      --rule-strong:#453f66;
+      --accent:#8b85e6;
+      --accent-ink:#d7d3fa;
+      --accent-soft:#241f42;
+      --danger:#e0785f;
+      --danger-soft:#3a2019;
+      --chip-bg:#211d38;
+      --shadow: 0 1px 2px rgba(0,0,0,.4), 0 20px 48px -20px rgba(0,0,0,.7);
+    }
+  }
+  :root[data-theme="dark"]{
+    --app-bg:#15131f;
+    --ink:#ece9f7;
+    --ink-muted:#a29cbd;
+    --rule:#332e4c;
+    --rule-strong:#453f66;
+    --accent:#8b85e6;
+    --accent-ink:#d7d3fa;
+    --accent-soft:#241f42;
+    --danger:#e0785f;
+    --danger-soft:#3a2019;
+    --chip-bg:#211d38;
+    --shadow: 0 1px 2px rgba(0,0,0,.4), 0 20px 48px -20px rgba(0,0,0,.7);
+  }
+
+  *{box-sizing:border-box;}
+  html,body{margin:0;}
+  body{
+    background:var(--app-bg);
+    color:var(--ink);
+    font-family:"Inter",system-ui,-apple-system,sans-serif;
+    padding-inline:16px;
+    padding-block:28px 60px;
+  }
+  h1,h2,.wordmark{font-family:"Fraunces",Georgia,serif;}
+
+  .shell{max-width:860px;margin-inline:auto;}
+
+  .toolbar{
+    display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;
+    margin-bottom:18px;
+  }
+  .toolbar-title{display:flex;flex-direction:column;gap:2px;}
+  .toolbar-title .eyebrow{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-muted);font-weight:600;}
+  .toolbar-title h1{font-size:21px;font-weight:600;margin:0;color:var(--ink);}
+  .toolbar-actions{display:flex;gap:8px;flex-wrap:wrap;}
+
+  button{
+    font-family:inherit;font-size:13.5px;font-weight:600;
+    border-radius:9px;padding:9px 16px;cursor:pointer;
+    border:1px solid var(--rule-strong);background:var(--paper);color:var(--ink);
+    display:inline-flex;align-items:center;gap:7px;
+    transition:background .12s ease, transform .06s ease, border-color .12s ease;
+  }
+  button:hover{border-color:var(--accent);}
+  button:active{transform:translateY(1px);}
+  button:focus-visible{outline:none;box-shadow:var(--focus);}
+  button.primary{background:var(--accent);border-color:var(--accent);color:#fff;}
+  button.primary:hover{background:var(--accent-ink);border-color:var(--accent-ink);}
+  button.ghost{background:transparent;border-color:transparent;color:var(--ink-muted);padding:9px 10px;}
+  button.ghost:hover{color:var(--ink);background:var(--chip-bg);}
+  button:disabled{opacity:.45;cursor:not-allowed;}
+
+  .status-line{
+    font-size:12px;color:var(--ink-muted);min-height:16px;margin-bottom:14px;
+    display:flex;align-items:center;gap:6px;
+  }
+  .status-line .dot{width:6px;height:6px;border-radius:50%;background:var(--accent);flex:none;}
+
+  .sheet{
+    background:var(--paper);
+    color:#1f1c2e;
+    border-radius:3px;
+    box-shadow:var(--shadow);
+    padding:40px 42px 34px;
+  }
+  @media (max-width:640px){ .sheet{padding:26px 18px 24px;} }
+
+  .sheet input, .sheet textarea, .sheet select{
+    font-family:"Inter",sans-serif;color:#1f1c2e;background:transparent;
+    border:none;outline:none;width:100%;padding:0;
+  }
+  .sheet ::placeholder{color:#b3ade6;opacity:.55;}
+
+  .field-line{border-bottom:1px dashed #d9d4ee;padding-block:3px;}
+  .field-line:focus-within{border-bottom-style:solid;border-bottom-color:var(--accent);}
+
+  .head{display:flex;justify-content:space-between;gap:24px;flex-wrap:wrap;margin-bottom:26px;}
+  .biz{display:flex;gap:14px;max-width:360px;}
+  .logo-box{
+    flex:none;width:64px;height:64px;border-radius:10px;border:1.5px dashed #d3cdec;
+    display:flex;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;
+    background:#faf9fd;color:#a79fd1;text-align:center;font-size:10px;line-height:1.25;font-weight:600;
+  }
+  .logo-box:hover{border-color:var(--accent);color:var(--accent-ink);}
+  .logo-box img{width:100%;height:100%;object-fit:contain;}
+  .biz-fields{display:flex;flex-direction:column;gap:3px;min-width:0;}
+  .biz-fields input{font-size:14.5px;font-weight:700;font-family:"Fraunces",serif;}
+  .biz-fields textarea{font-size:12px;color:#615a7c;resize:none;overflow:hidden;line-height:1.45;}
+  .biz-fields .small-row{display:flex;gap:8px;}
+  .biz-fields .small-row input{font-size:12px;color:#615a7c;font-weight:400;}
+  .logo-remove{font-size:10.5px;color:var(--ink-muted);background:none;border:none;padding:2px 0;cursor:pointer;text-decoration:underline;text-underline-offset:2px;}
+
+  .meta{text-align:right;min-width:220px;}
+  .meta .wordmark{font-size:22px;font-weight:800;letter-spacing:.01em;color:#161331;margin:0;}
+  .meta .wordmark-th{font-size:12px;font-weight:500;color:#8a83ad;margin:0 0 9px;font-family:"Inter",sans-serif;}
+  .copy-toggle{display:inline-flex;border:1px solid var(--rule-strong);border-radius:7px;overflow:hidden;margin-bottom:9px;}
+  .copy-toggle button{border:none;border-radius:0;padding:4px 10px;font-size:10.5px;background:var(--paper);color:var(--ink-muted);}
+  .copy-toggle button.active{background:var(--accent);color:#fff;}
+  .meta-row{display:flex;justify-content:flex-end;gap:8px;align-items:baseline;font-size:12.5px;margin-bottom:4px;}
+  .meta-row label{color:#8a83ad;flex:none;}
+  .meta-row input, .meta-row select{
+    text-align:right;font-variant-numeric:tabular-nums;font-weight:600;font-size:12.5px;width:auto;min-width:96px;
+  }
+  .meta-row.number input{font-family:"Fraunces",serif;font-size:14px;}
+
+  .parties{display:flex;gap:30px;flex-wrap:wrap;margin-bottom:24px;}
+  .party{flex:1 1 220px;min-width:220px;}
+  .party .label{font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:#a79fd1;font-weight:700;margin-bottom:7px;}
+  .party input{font-size:14px;font-weight:600;margin-bottom:3px;}
+  .party textarea{font-size:12px;color:#615a7c;resize:none;overflow:hidden;line-height:1.5;}
+  .party .subfield{font-size:11.5px !important;font-weight:400 !important;color:#8a83ad !important;margin-top:2px;}
+
+  .items{width:100%;border-collapse:collapse;margin-bottom:4px;}
+  .items thead th{
+    text-align:left;font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:#a79fd1;
+    font-weight:700;padding-bottom:8px;border-bottom:1.5px solid #1f1c2e;
+  }
+  .items thead th.num{text-align:right;}
+  .items tbody td{padding-block:9px;border-bottom:1px solid #efecf9;vertical-align:top;}
+  .items tbody tr:last-child td{border-bottom:1.5px solid #1f1c2e;}
+  .items td.num input{text-align:right;font-variant-numeric:tabular-nums;}
+  .items td.amount{text-align:right;font-variant-numeric:tabular-nums;font-weight:600;white-space:nowrap;padding-top:9px;}
+  .items td.desc textarea{resize:none;overflow:hidden;line-height:1.45;font-size:13px;min-height:20px;}
+  .items td.qty{width:60px;}
+  .items td.price{width:120px;}
+  .items td.amount{width:110px;}
+  .items td.rowctl{width:28px;padding-top:7px;}
+  .row-remove{background:none;border:none;color:#c7c1e3;cursor:pointer;padding:2px 4px;border-radius:5px;font-size:15px;line-height:1;}
+  .row-remove:hover{color:var(--danger);background:var(--danger-soft);}
+  .price-wrap{display:flex;align-items:center;justify-content:flex-end;gap:2px;white-space:nowrap;}
+  .money-prefix{color:#a79fd1;flex:none;}
+
+  .add-line{margin-top:10px;font-size:12.5px;font-weight:600;color:var(--accent-ink);background:none;border:none;padding:4px 0;cursor:pointer;display:inline-flex;align-items:center;gap:5px;}
+  .add-line:hover{text-decoration:underline;}
+
+  .totals{display:flex;justify-content:flex-end;margin-top:22px;}
+  .totals-box{width:270px;}
+  .totals-row{display:flex;justify-content:space-between;align-items:center;font-size:13px;padding-block:6px;color:#615a7c;}
+  .totals-row.vat-row label{display:flex;align-items:center;gap:6px;cursor:pointer;}
+  .totals-row.vat-row input[type="checkbox"]{width:14px;height:14px;accent-color:var(--accent);cursor:pointer;}
+  .totals-row.vat-row .rate-input{width:34px;text-align:right;border-bottom:1px dashed #d9d4ee;font-variant-numeric:tabular-nums;}
+  .totals-row .val{font-variant-numeric:tabular-nums;font-weight:600;color:#1f1c2e;}
+  .totals-row.grand{border-top:1.5px solid #1f1c2e;margin-top:4px;padding-top:10px;font-size:16px;}
+  .totals-row.grand .label{font-family:"Fraunces",serif;font-weight:700;color:#1f1c2e;}
+  .totals-row.grand .val{font-family:"Fraunces",serif;font-size:19px;font-weight:700;color:var(--accent-ink);}
+
+  .foot{display:flex;gap:30px;flex-wrap:wrap;margin-top:32px;padding-top:20px;border-top:1px solid #efecf9;}
+  .foot .col{flex:1 1 240px;min-width:220px;}
+  .foot .label{font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:#a79fd1;font-weight:700;margin-bottom:7px;}
+  .foot textarea{font-size:12px;color:#615a7c;resize:none;overflow:hidden;line-height:1.55;min-height:40px;}
+
+  .email-row{display:flex;gap:8px;margin-top:26px;padding-top:18px;border-top:1px solid #efecf9;align-items:flex-end;flex-wrap:wrap;}
+  .email-row .field{flex:1 1 220px;min-width:200px;}
+  .email-row .label{font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:#a79fd1;font-weight:700;margin-bottom:7px;}
+  .email-row .field-line{padding-block:6px;}
+
+  .hint{max-width:860px;margin:16px auto 0;font-size:12px;color:var(--ink-muted);line-height:1.55;display:flex;gap:8px;}
+  .hint b{color:var(--ink);}
+
+  /* ---- history ---- */
+  .history{max-width:860px;margin:26px auto 0;}
+  .history-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+  .history-head h2{font-size:15px;margin:0;font-weight:600;}
+  .history-table{width:100%;border-collapse:collapse;background:var(--paper);border-radius:10px;overflow:hidden;box-shadow:var(--shadow);}
+  .history-table th{text-align:left;font-size:10.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-muted);font-weight:700;padding:10px 14px;border-bottom:1px solid var(--rule);}
+  .history-table td{padding:10px 14px;font-size:13px;border-bottom:1px solid var(--rule);vertical-align:middle;}
+  .history-table tr:last-child td{border-bottom:none;}
+  .history-table td.num{text-align:right;font-variant-numeric:tabular-nums;}
+  .history-empty{padding:18px 14px;font-size:12.5px;color:var(--ink-muted);background:var(--paper);border-radius:10px;box-shadow:var(--shadow);}
+  .hist-actions{display:flex;gap:6px;}
+  .hist-actions button{padding:5px 10px;font-size:11.5px;}
+
+  input[type="file"]{display:none;}
+  @media (max-width:520px){
+    .head{flex-direction:column;}
+    .meta{text-align:left;}
+    .meta-row{justify-content:space-between;}
+    .meta .wordmark, .meta .wordmark-th{text-align:left;}
+    .copy-toggle{align-self:flex-start;}
+  }
+</style>
+</head>
+<body>
+<div class="shell">
+  <div class="toolbar">
+    <div class="toolbar-title">
+      <span class="eyebrow">Ajmal Perfume Co., Ltd. · Invoicing</span>
+      <h1>Tax Invoice Generator</h1>
+    </div>
+    <div class="toolbar-actions">
+      <button class="ghost" id="newInvoiceBtn" type="button">↻ New invoice</button>
+      <button class="primary" id="downloadBtn" type="button">⬇ Download PDF</button>
+    </div>
+  </div>
+  <div class="status-line" id="statusLine"><span class="dot"></span><span>Everything you type is saved on this device automatically — no account or internet needed after the page loads.</span></div>
+
+  <div class="sheet" id="sheet">
+    <div class="head">
+      <div class="biz">
+        <div>
+          <div class="logo-box" id="logoBox" title="Click to change logo">
+            <span id="logoPlaceholder">Add<br>logo</span>
+          </div>
+          <button class="logo-remove" id="logoRemoveBtn" type="button" hidden>remove logo</button>
+          <input type="file" id="logoInput" accept="image/png,image/jpeg,image/webp,image/svg+xml">
+        </div>
+        <div class="biz-fields">
+          <div class="field-line"><input id="bizName" placeholder="Your Business Name" maxlength="80"></div>
+          <div class="field-line"><textarea id="bizAddr" rows="1" placeholder="Street address, Bangkok, Thailand" maxlength="180"></textarea></div>
+          <div class="small-row">
+            <div class="field-line" style="flex:1"><input id="bizTaxId" placeholder="Tax ID (13 digits)" maxlength="20"></div>
+          </div>
+          <div class="small-row">
+            <div class="field-line" style="flex:1"><input id="bizPhone" placeholder="Phone" maxlength="30"></div>
+            <div class="field-line" style="flex:1"><input id="bizFax" placeholder="Fax" maxlength="30"></div>
+          </div>
+          <div class="small-row">
+            <div class="field-line" style="flex:1"><input id="bizEmail" placeholder="Email" maxlength="60"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="meta">
+        <p class="wordmark">TAX INVOICE</p>
+        <p class="wordmark-th">ใบกำกับภาษี</p>
+        <div class="copy-toggle" id="copyToggle">
+          <button type="button" data-val="Original" class="active">Original</button>
+          <button type="button" data-val="Copy">Copy</button>
+        </div>
+        <div class="meta-row number"><label for="invNumber">No.</label><input id="invNumber" maxlength="24"></div>
+        <div class="meta-row"><label for="invIssue">Issued</label><input id="invIssue" type="date"></div>
+        <div class="meta-row"><label for="invDue">Due</label><input id="invDue" type="date"></div>
+        <div class="meta-row"><label for="invTerms">Terms</label>
+          <select id="invTerms">
+            <option value="0">Due on receipt</option>
+            <option value="7">Net 7</option>
+            <option value="14" selected>Net 14</option>
+            <option value="30">Net 30</option>
+            <option value="custom">Custom</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="parties">
+      <div class="party">
+        <div class="label">Bill to · ลูกค้า</div>
+        <div class="field-line"><input id="cliName" placeholder="Client or company name" maxlength="80"></div>
+        <div class="field-line"><textarea id="cliAddr" rows="1" placeholder="Client address" maxlength="180"></textarea></div>
+        <div class="field-line"><input id="cliTaxId" class="subfield" placeholder="Client Tax ID (optional, for B2B)" maxlength="20"></div>
+        <div class="field-line"><input id="cliEmail" placeholder="Client email" maxlength="60"></div>
+      </div>
+      <div class="party">
+        <div class="label">Payable to</div>
+        <div class="field-line"><textarea id="bizBank" rows="3" placeholder="Bank, account name and account number, or PromptPay ID">Bank transfer — add your account name, bank, and account number</textarea></div>
+      </div>
+    </div>
+
+    <table class="items" id="itemsTable">
+      <thead>
+        <tr>
+          <th style="width:auto">Description</th>
+          <th class="num">Qty</th>
+          <th class="num">Unit price</th>
+          <th class="num">Amount</th>
+          <th style="width:28px"></th>
+        </tr>
+      </thead>
+      <tbody id="itemsBody"></tbody>
+    </table>
+    <button class="add-line" id="addLineBtn" type="button">+ Add line item</button>
+
+    <div class="totals">
+      <div class="totals-box">
+        <div class="totals-row"><span>Subtotal</span><span class="val" id="subtotalVal">฿0.00</span></div>
+        <div class="totals-row vat-row">
+          <label><input type="checkbox" id="vatEnabled" checked> VAT <input class="rate-input" id="vatRate" value="7" inputmode="decimal">%</label>
+          <span class="val" id="vatVal">฿0.00</span>
+        </div>
+        <div class="totals-row grand"><span class="label">Total (THB)</span><span class="val" id="totalVal">฿0.00</span></div>
+      </div>
+    </div>
+
+    <div class="foot">
+      <div class="col">
+        <div class="label">Notes</div>
+        <div class="field-line"><textarea id="notes" rows="2" placeholder="Thank you for your business!"></textarea></div>
+      </div>
+      <div class="col">
+        <div class="label">Terms</div>
+        <div class="field-line"><textarea id="termsText" rows="2" placeholder="Payment due within the stated terms.">Payment due within the stated terms.</textarea></div>
+      </div>
+    </div>
+
+    <div class="email-row">
+      <div class="field">
+        <div class="label">Email this invoice to</div>
+        <div class="field-line"><input id="sendToEmail" placeholder="client@example.com" maxlength="120"></div>
+      </div>
+      <button class="ghost" id="emailBtn" type="button" style="border:1px solid var(--rule-strong);">✉ Email to client</button>
+    </div>
+  </div>
+
+  <p class="hint"><span>💡</span><span><b>How this works:</b> fill in the sheet above — it's remembered on this device for next time. <b>Download PDF</b> saves a print-ready tax invoice straight to your downloads folder. <b>Email to client</b> downloads the PDF and opens your email app with the client's address and a message ready — just drag the PDF that downloaded into the email before sending, since a webpage on its own can't attach a file for you.</span></p>
+
+  <div class="history">
+    <div class="history-head"><h2>Recent invoices</h2></div>
+    <div id="historyWrap"></div>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var STORE_KEY = "ajmalInvoice.state.v1";
+  var HISTORY_KEY = "ajmalInvoice.history.v1";
+  var DEFAULT_LOGO = "assets/logo.png";
+
+  var el = {};
+  ["bizName","bizAddr","bizTaxId","bizPhone","bizFax","bizEmail","bizBank",
+   "invNumber","invIssue","invDue","invTerms",
+   "cliName","cliAddr","cliTaxId","cliEmail",
+   "vatEnabled","vatRate","notes","termsText","sendToEmail",
+   "logoBox","logoInput","logoPlaceholder","logoRemoveBtn","copyToggle",
+   "itemsBody","addLineBtn","downloadBtn","newInvoiceBtn","emailBtn","statusLine",
+   "subtotalVal","vatVal","totalVal","historyWrap"].forEach(function(id){ el[id] = document.getElementById(id); });
+
+  var fmt = function(n){
+    n = Number(n) || 0;
+    return "฿" + n.toLocaleString("en-US", {minimumFractionDigits:2, maximumFractionDigits:2});
+  };
+  var todayISO = function(){ return new Date().toISOString().slice(0,10); };
+  var addDays = function(iso, days){
+    var d = iso ? new Date(iso+"T00:00:00") : new Date();
+    d.setDate(d.getDate() + Number(days||0));
+    return d.toISOString().slice(0,10);
+  };
+
+  var state = {
+    logo: undefined, // undefined = use default asset; null = explicitly removed; string = custom data URL
+    copyType: "Original",
+    biz: {
+      name:"Ajmal Perfume Co., Ltd.",
+      addr:"1-10, Level-G, Nana Square, Sukhumvit Soi 3, Klongtoey Nua, Wattana, Bangkok 10110, Thailand",
+      taxId:"", phone:"+66 8 1874 7188", fax:"+66 2 655 6997", email:"ratanpun@gmail.com",
+      bank:"Bank transfer — add your account name, bank, and account number"
+    },
+    client: {name:"", addr:"", taxId:"", email:""},
+    meta: {number:"AJ-INV-0001", issue: todayISO(), due: addDays(todayISO(),14), terms:"14"},
+    vat: {enabled:true, rate:7},
+    items: [{desc:"", qty:1, price:""}],
+    notes: "",
+    termsText: "Payment due within the stated terms.",
+    sendToEmail: ""
+  };
+
+  function load(){
+    try{
+      var raw = localStorage.getItem(STORE_KEY);
+      if(!raw) return;
+      var saved = JSON.parse(raw);
+      if(saved && typeof saved === "object"){
+        if(Object.prototype.hasOwnProperty.call(saved,"logo")) state.logo = saved.logo;
+        state.copyType = saved.copyType || state.copyType;
+        state.biz = Object.assign({}, state.biz, saved.biz);
+        state.client = Object.assign({}, state.client, saved.client);
+        state.meta = Object.assign({}, state.meta, saved.meta);
+        state.vat = Object.assign({}, state.vat, saved.vat);
+        if(Array.isArray(saved.items) && saved.items.length) state.items = saved.items;
+        if(typeof saved.notes === "string") state.notes = saved.notes;
+        if(typeof saved.termsText === "string") state.termsText = saved.termsText;
+        if(typeof saved.sendToEmail === "string") state.sendToEmail = saved.sendToEmail;
+      }
+    }catch(e){ /* corrupt or unavailable storage — continue with defaults */ }
+  }
+
+  var saveTimer = null;
+  function save(){
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(function(){
+      try{ localStorage.setItem(STORE_KEY, JSON.stringify(state)); }catch(e){ /* storage unavailable */ }
+    }, 250);
+  }
+
+  function autosize(ta){ ta.style.height = "auto"; ta.style.height = (ta.scrollHeight) + "px"; }
+
+  // ---------- logo ----------
+  function currentLogoSrc(){
+    if(state.logo === null) return null;
+    if(typeof state.logo === "string" && state.logo) return state.logo;
+    return DEFAULT_LOGO;
+  }
+  function renderLogo(){
+    var src = currentLogoSrc();
+    if(src){
+      el.logoBox.innerHTML = '<img src="'+src+'" alt="Business logo">';
+      el.logoRemoveBtn.hidden = false;
+    } else {
+      el.logoBox.innerHTML = '<span>Add<br>logo</span>';
+      el.logoRemoveBtn.hidden = true;
+    }
+  }
+  el.logoBox.addEventListener("click", function(){ el.logoInput.click(); });
+  el.logoInput.addEventListener("change", function(){
+    var file = el.logoInput.files && el.logoInput.files[0];
+    if(!file) return;
+    var reader = new FileReader();
+    reader.onload = function(){ state.logo = reader.result; renderLogo(); save(); };
+    reader.readAsDataURL(file);
+  });
+  el.logoRemoveBtn.addEventListener("click", function(){
+    state.logo = null; el.logoInput.value = ""; renderLogo(); save();
+  });
+
+  // ---------- copy/original toggle ----------
+  Array.prototype.forEach.call(el.copyToggle.querySelectorAll("button"), function(btn){
+    btn.addEventListener("click", function(){
+      state.copyType = btn.getAttribute("data-val");
+      Array.prototype.forEach.call(el.copyToggle.querySelectorAll("button"), function(b){ b.classList.toggle("active", b===btn); });
+      save();
+    });
+  });
+
+  // ---------- simple text fields ----------
+  var textMap = [
+    ["bizName","biz","name"], ["bizAddr","biz","addr"], ["bizTaxId","biz","taxId"],
+    ["bizPhone","biz","phone"], ["bizFax","biz","fax"], ["bizEmail","biz","email"], ["bizBank","biz","bank"],
+    ["cliName","client","name"], ["cliAddr","client","addr"], ["cliTaxId","client","taxId"], ["cliEmail","client","email"],
+    ["invNumber","meta","number"]
+  ];
+  textMap.forEach(function(m){
+    var node = el[m[0]];
+    node.value = state[m[1]][m[2]] || "";
+    if(node.tagName === "TEXTAREA") autosize(node);
+    node.addEventListener("input", function(){
+      state[m[1]][m[2]] = node.value;
+      if(node.tagName === "TEXTAREA") autosize(node);
+      save();
+    });
+  });
+  el.notes.value = state.notes; autosize(el.notes);
+  el.notes.addEventListener("input", function(){ state.notes = el.notes.value; autosize(el.notes); save(); });
+  el.termsText.value = state.termsText; autosize(el.termsText);
+  el.termsText.addEventListener("input", function(){ state.termsText = el.termsText.value; autosize(el.termsText); save(); });
+  el.sendToEmail.value = state.sendToEmail;
+  el.sendToEmail.addEventListener("input", function(){ state.sendToEmail = el.sendToEmail.value; save(); });
+
+  // ---------- dates ----------
+  el.invIssue.value = state.meta.issue;
+  el.invDue.value = state.meta.due;
+  el.invTerms.value = state.meta.terms || "14";
+  el.invIssue.addEventListener("change", function(){
+    state.meta.issue = el.invIssue.value;
+    if(state.meta.terms !== "custom"){ state.meta.due = addDays(state.meta.issue, state.meta.terms); el.invDue.value = state.meta.due; }
+    save();
+  });
+  el.invDue.addEventListener("change", function(){
+    state.meta.due = el.invDue.value; state.meta.terms = "custom"; el.invTerms.value = "custom"; save();
+  });
+  el.invTerms.addEventListener("change", function(){
+    state.meta.terms = el.invTerms.value;
+    if(state.meta.terms !== "custom"){ state.meta.due = addDays(state.meta.issue, state.meta.terms); el.invDue.value = state.meta.due; }
+    save();
+  });
+
+  // ---------- VAT ----------
+  el.vatEnabled.checked = !!state.vat.enabled;
+  el.vatRate.value = state.vat.rate;
+  el.vatEnabled.addEventListener("change", function(){ state.vat.enabled = el.vatEnabled.checked; renderTotals(); save(); });
+  el.vatRate.addEventListener("input", function(){
+    var n = parseFloat(el.vatRate.value); state.vat.rate = isNaN(n) ? 0 : n; renderTotals(); save();
+  });
+
+  // ---------- line items ----------
+  function itemAmount(it){
+    var q = parseFloat(it.qty), p = parseFloat(it.price);
+    if(isNaN(q)) q = 0; if(isNaN(p)) p = 0;
+    return q * p;
+  }
+
+  function renderItems(){
+    el.itemsBody.innerHTML = "";
+    state.items.forEach(function(it, idx){
+      var tr = document.createElement("tr");
+      tr.innerHTML =
+        '<td class="desc"><textarea rows="1" placeholder="e.g. Oud perfume oil, 12ml" maxlength="200"></textarea></td>' +
+        '<td class="num qty"><input type="text" inputmode="decimal" placeholder="1"></td>' +
+        '<td class="num price"><div class="price-wrap"><span class="money-prefix">฿</span><input type="text" inputmode="decimal" placeholder="0.00"></div></td>' +
+        '<td class="amount">' + fmt(itemAmount(it)) + '</td>' +
+        '<td class="rowctl"><button type="button" class="row-remove" title="Remove line" aria-label="Remove line">×</button></td>';
+
+      var descTa = tr.querySelector(".desc textarea");
+      var qtyIn = tr.querySelector(".qty input");
+      var priceIn = tr.querySelector(".price input");
+      var amountTd = tr.querySelector(".amount");
+      var removeBtn = tr.querySelector(".row-remove");
+
+      descTa.value = it.desc || "";
+      qtyIn.value = (it.qty === "" || it.qty == null) ? "" : it.qty;
+      priceIn.value = (it.price === "" || it.price == null) ? "" : it.price;
+      autosize(descTa);
+
+      descTa.addEventListener("input", function(){ it.desc = descTa.value; autosize(descTa); save(); });
+      qtyIn.addEventListener("input", function(){ it.qty = qtyIn.value; amountTd.textContent = fmt(itemAmount(it)); renderTotals(); save(); });
+      priceIn.addEventListener("input", function(){ it.price = priceIn.value; amountTd.textContent = fmt(itemAmount(it)); renderTotals(); save(); });
+      removeBtn.addEventListener("click", function(){
+        state.items.splice(idx, 1);
+        if(state.items.length === 0) state.items.push({desc:"", qty:1, price:""});
+        renderItems(); renderTotals(); save();
+      });
+      el.itemsBody.appendChild(tr);
+    });
+  }
+
+  el.addLineBtn.addEventListener("click", function(){
+    state.items.push({desc:"", qty:1, price:""});
+    renderItems();
+    var lastDesc = el.itemsBody.querySelector("tr:last-child .desc textarea");
+    if(lastDesc) lastDesc.focus();
+    save();
+  });
+
+  function computeTotals(){
+    var subtotal = state.items.reduce(function(sum, it){ return sum + itemAmount(it); }, 0);
+    var vat = state.vat.enabled ? subtotal * (state.vat.rate/100) : 0;
+    var total = subtotal + vat;
+    return {subtotal:subtotal, vat:vat, total:total};
+  }
+  function renderTotals(){
+    var t = computeTotals();
+    el.subtotalVal.textContent = fmt(t.subtotal);
+    el.vatVal.textContent = fmt(t.vat);
+    el.totalVal.textContent = fmt(t.total);
+  }
+
+  // ---------- history ----------
+  function loadHistory(){
+    try{ return JSON.parse(localStorage.getItem(HISTORY_KEY) || "[]"); }catch(e){ return []; }
+  }
+  function saveHistory(list){
+    try{ localStorage.setItem(HISTORY_KEY, JSON.stringify(list)); }catch(e){}
+  }
+  function recordToHistory(){
+    var t = computeTotals();
+    var entry = {
+      number: state.meta.number, date: state.meta.issue,
+      client: state.client.name || "(no client name)", total: t.total,
+      snapshot: JSON.parse(JSON.stringify(state))
+    };
+    var list = loadHistory();
+    var existingIdx = list.findIndex(function(r){ return r.number === entry.number; });
+    if(existingIdx >= 0) list[existingIdx] = entry; else list.unshift(entry);
+    list = list.slice(0, 50);
+    saveHistory(list);
+    renderHistory();
+  }
+  function renderHistory(){
+    var list = loadHistory();
+    if(!list.length){
+      el.historyWrap.innerHTML = '<div class="history-empty">Invoices you download or email will show up here, kept only on this device.</div>';
+      return;
+    }
+    var rows = list.map(function(r, i){
+      return '<tr>' +
+        '<td>'+escapeHtml(r.number)+'</td>' +
+        '<td>'+escapeHtml(r.date||"")+'</td>' +
+        '<td>'+escapeHtml(r.client)+'</td>' +
+        '<td class="num">'+fmt(r.total)+'</td>' +
+        '<td><div class="hist-actions">' +
+          '<button type="button" class="ghost" data-act="load" data-idx="'+i+'" style="border:1px solid var(--rule-strong);">Reopen</button>' +
+          '<button type="button" class="ghost" data-act="del" data-idx="'+i+'" style="border:1px solid var(--rule-strong);">Delete</button>' +
+        '</div></td>' +
+      '</tr>';
+    }).join("");
+    el.historyWrap.innerHTML = '<table class="history-table"><thead><tr><th>No.</th><th>Date</th><th>Client</th><th class="num">Total</th><th></th></tr></thead><tbody>'+rows+'</tbody></table>';
+    Array.prototype.forEach.call(el.historyWrap.querySelectorAll("button[data-act]"), function(btn){
+      btn.addEventListener("click", function(){
+        var idx = Number(btn.getAttribute("data-idx"));
+        var list2 = loadHistory();
+        var rec = list2[idx];
+        if(!rec) return;
+        if(btn.getAttribute("data-act") === "del"){
+          list2.splice(idx,1); saveHistory(list2); renderHistory();
+        } else {
+          state = JSON.parse(JSON.stringify(rec.snapshot));
+          bootFieldsFromState();
+          el.statusLine.querySelector("span:last-child").textContent = "Reopened " + rec.number + " — edit and re-download or re-email as needed.";
+        }
+      });
+    });
+  }
+  function escapeHtml(s){ return String(s==null?"":s).replace(/[&<>"']/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]; }); }
+
+  // ---------- new invoice ----------
+  el.newInvoiceBtn.addEventListener("click", function(){
+    var current = state.meta.number || "AJ-INV-0000";
+    var m = current.match(/^(.*?)(\d+)(\D*)$/);
+    var nextNumber;
+    if(m){
+      var digits = m[2];
+      var next = String(parseInt(digits,10) + 1).padStart(digits.length, "0");
+      nextNumber = m[1] + next + m[3];
+    } else { nextNumber = current + "-2"; }
+    state.meta.number = nextNumber;
+    state.meta.issue = todayISO();
+    state.meta.terms = state.meta.terms === "custom" ? "14" : state.meta.terms;
+    state.meta.due = addDays(state.meta.issue, state.meta.terms);
+    state.client = {name:"", addr:"", taxId:"", email:""};
+    state.items = [{desc:"", qty:1, price:""}];
+    state.notes = ""; state.sendToEmail = ""; state.copyType = "Original";
+
+    bootFieldsFromState();
+    save();
+    el.statusLine.querySelector("span:last-child").textContent = "Started " + state.meta.number + " — client and line items cleared, business details kept.";
+    el.cliName.focus();
+  });
+
+  function bootFieldsFromState(){
+    el.bizName.value = state.biz.name; el.bizAddr.value = state.biz.addr; autosize(el.bizAddr);
+    el.bizTaxId.value = state.biz.taxId; el.bizPhone.value = state.biz.phone; el.bizFax.value = state.biz.fax;
+    el.bizEmail.value = state.biz.email; el.bizBank.value = state.biz.bank; autosize(el.bizBank);
+    el.cliName.value = state.client.name; el.cliAddr.value = state.client.addr; autosize(el.cliAddr);
+    el.cliTaxId.value = state.client.taxId; el.cliEmail.value = state.client.email;
+    el.invNumber.value = state.meta.number; el.invIssue.value = state.meta.issue;
+    el.invDue.value = state.meta.due; el.invTerms.value = state.meta.terms;
+    el.vatEnabled.checked = !!state.vat.enabled; el.vatRate.value = state.vat.rate;
+    el.notes.value = state.notes; autosize(el.notes);
+    el.termsText.value = state.termsText; autosize(el.termsText);
+    el.sendToEmail.value = state.sendToEmail;
+    Array.prototype.forEach.call(el.copyToggle.querySelectorAll("button"), function(b){
+      b.classList.toggle("active", b.getAttribute("data-val") === state.copyType);
+    });
+    renderLogo();
+    renderItems();
+    renderTotals();
+  }
+
+  // ---------- PDF ----------
+  function dataUrlToImageFormat(dataUrl){
+    if(!dataUrl) return "PNG";
+    if(dataUrl.indexOf("image/jpeg") !== -1 || dataUrl.indexOf("image/jpg") !== -1) return "JPEG";
+    if(dataUrl.indexOf("image/webp") !== -1) return "WEBP";
+    return "PNG";
+  }
+  function loadImageAsDataUrl(src){
+    return new Promise(function(resolve){
+      if(src.indexOf("data:") === 0){ resolve(src); return; }
+      var img = new Image();
+      img.crossOrigin = "anonymous";
+      img.onload = function(){
+        try{
+          var canvas = document.createElement("canvas");
+          canvas.width = img.naturalWidth; canvas.height = img.naturalHeight;
+          canvas.getContext("2d").drawImage(img, 0, 0);
+          resolve(canvas.toDataURL("image/png"));
+        }catch(e){ resolve(null); }
+      };
+      img.onerror = function(){ resolve(null); };
+      img.src = src;
+    });
+  }
+
+  function buildPdf(logoDataUrl){
+    var jsPDF = window.jspdf.jsPDF;
+    var doc = new jsPDF({unit:"mm", format:"a4"});
+    var pageW = 210, marginX = 18;
+    var contentW = pageW - marginX*2;
+    var ink = [31,28,46], muted = [141,131,173], accent = [24,20,73], rule = [227,224,236];
+    var y = 20;
+
+    var textX = marginX;
+    if(logoDataUrl){
+      try{
+        var fmtImg = dataUrlToImageFormat(logoDataUrl);
+        doc.addImage(logoDataUrl, fmtImg, marginX, y - 2, 22, 22, undefined, "FAST");
+        textX = marginX + 28;
+      }catch(e){ textX = marginX; }
+    }
+    doc.setTextColor.apply(doc, ink);
+    doc.setFont("times", "bold"); doc.setFontSize(13);
+    doc.text(state.biz.name || "Your Business Name", textX, y + 3);
+    doc.setFont("helvetica", "normal"); doc.setFontSize(9);
+    doc.setTextColor.apply(doc, muted);
+    var bizLines = [];
+    if(state.biz.addr) bizLines = bizLines.concat(doc.splitTextToSize(state.biz.addr, 84));
+    if(state.biz.taxId) bizLines.push("Tax ID " + state.biz.taxId);
+    var contactLine = [state.biz.phone, state.biz.fax ? ("Fax " + state.biz.fax) : ""].filter(Boolean).join("   ·   ");
+    if(contactLine) bizLines.push(contactLine);
+    if(state.biz.email) bizLines.push(state.biz.email);
+    var by = y + 8;
+    bizLines.forEach(function(line){ doc.text(line, textX, by); by += 4.3; });
+
+    var rightX = pageW - marginX;
+    doc.setFont("times", "bold"); doc.setFontSize(18);
+    doc.setTextColor.apply(doc, ink);
+    doc.text("TAX INVOICE", rightX, y, {align:"right"});
+    doc.setFont("helvetica", "normal"); doc.setFontSize(9);
+    doc.setTextColor.apply(doc, muted);
+    doc.text("ใบกำกับภาษี · " + (state.copyType || "Original"), rightX, y + 5, {align:"right"});
+    var metaY = y + 12;
+    function metaLine(label, value){
+      doc.setTextColor.apply(doc, muted);
+      doc.setFont("helvetica","normal"); doc.setFontSize(9.5);
+      doc.text(label, rightX - 34, metaY, {align:"left"});
+      doc.setTextColor.apply(doc, ink);
+      doc.setFont("helvetica","bold");
+      doc.text(String(value||""), rightX, metaY, {align:"right"});
+      metaY += 5.2;
+    }
+    metaLine("No.", state.meta.number);
+    metaLine("Issued", state.meta.issue);
+    metaLine("Due", state.meta.due);
+
+    var headerBottom = Math.max(by, metaY) + 6;
+
+    doc.setDrawColor.apply(doc, rule);
+    var colW = contentW/2 - 6;
+    function labelBlock(x, w, label, lines){
+      doc.setFont("helvetica","bold"); doc.setFontSize(8);
+      doc.setTextColor.apply(doc, muted);
+      doc.text(label.toUpperCase(), x, headerBottom);
+      var ly = headerBottom + 5;
+      doc.setFont("helvetica","normal"); doc.setFontSize(10);
+      doc.setTextColor.apply(doc, ink);
+      lines.filter(Boolean).forEach(function(line, i){
+        doc.setFont("helvetica", i===0 ? "bold" : "normal");
+        doc.splitTextToSize(line, w).forEach(function(l){ doc.text(l, x, ly); ly += 4.6; });
+      });
+      return ly;
+    }
+    var billLines = [state.client.name, state.client.addr, state.client.taxId ? ("Tax ID " + state.client.taxId) : "", state.client.email];
+    var y1 = labelBlock(marginX, colW, "Bill to", billLines);
+    var y2 = labelBlock(marginX + colW + 12, colW, "Payable to", [state.biz.bank]);
+    var afterParties = Math.max(y1, y2) + 8;
+
+    var descW = contentW - 15 - 32 - 34;
+    var colX = { desc: marginX, qtyR: marginX + descW + 15, priceR: marginX + descW + 15 + 32, amtR: marginX + contentW };
+    var ty = afterParties;
+    doc.setDrawColor.apply(doc, ink); doc.setLineWidth(0.4);
+    doc.setFont("helvetica","bold"); doc.setFontSize(8);
+    doc.setTextColor.apply(doc, muted);
+    doc.text("DESCRIPTION", colX.desc, ty);
+    doc.text("QTY", colX.qtyR, ty, {align:"right"});
+    doc.text("UNIT PRICE", colX.priceR, ty, {align:"right"});
+    doc.text("AMOUNT", colX.amtR, ty, {align:"right"});
+    ty += 2.5;
+    doc.line(marginX, ty, marginX + contentW, ty);
+    ty += 6;
+
+    doc.setFont("helvetica","normal"); doc.setFontSize(9.5);
+    doc.setTextColor.apply(doc, ink);
+    var pageH = 297, bottomLimit = pageH - 26;
+    state.items.forEach(function(it){
+      if(!it.desc && !it.qty && !it.price) return;
+      var lines = doc.splitTextToSize(it.desc || "—", descW);
+      var rowH = Math.max(lines.length * 4.4, 4.4);
+      if(ty + rowH > bottomLimit){ doc.addPage(); ty = 20; }
+      lines.forEach(function(l, i){ doc.text(l, colX.desc, ty + i*4.4); });
+      var q = it.qty === "" || it.qty == null ? "" : it.qty;
+      doc.text(String(q), colX.qtyR, ty, {align:"right"});
+      var p = parseFloat(it.price);
+      doc.text(isNaN(p) ? "" : fmt(p), colX.priceR, ty, {align:"right"});
+      doc.setFont("helvetica","bold");
+      doc.text(fmt(itemAmount(it)), colX.amtR, ty, {align:"right"});
+      doc.setFont("helvetica","normal");
+      ty += rowH + 3.5;
+    });
+    doc.setDrawColor.apply(doc, rule); doc.setLineWidth(0.25);
+    doc.line(marginX, ty, marginX + contentW, ty);
+    ty += 8;
+
+    if(ty + 34 > bottomLimit){ doc.addPage(); ty = 20; }
+    var t = computeTotals();
+    var boxX = marginX + contentW - 72;
+    function totalRow(label, value, bold){
+      doc.setFont("helvetica", bold ? "bold" : "normal");
+      doc.setFontSize(bold ? 11.5 : 9.5);
+      doc.setTextColor.apply(doc, bold ? ink : muted);
+      doc.text(label, boxX, ty);
+      doc.setTextColor.apply(doc, bold ? accent : ink);
+      doc.text(fmt(value), marginX + contentW, ty, {align:"right"});
+      ty += bold ? 7.5 : 5.5;
+    }
+    totalRow("Subtotal", t.subtotal, false);
+    if(state.vat.enabled) totalRow("VAT (" + state.vat.rate + "%)", t.vat, false);
+    doc.setDrawColor.apply(doc, ink); doc.setLineWidth(0.3);
+    doc.line(boxX, ty - 3.5, marginX + contentW, ty - 3.5);
+    totalRow("Total (THB)", t.total, true);
+    ty += 6;
+
+    if(ty + 24 > bottomLimit){ doc.addPage(); ty = 20; }
+    var footColW = contentW/2 - 6;
+    function footBlock(x, label, text){
+      if(!text) return;
+      doc.setFont("helvetica","bold"); doc.setFontSize(8);
+      doc.setTextColor.apply(doc, muted);
+      doc.text(label.toUpperCase(), x, ty);
+      doc.setFont("helvetica","normal"); doc.setFontSize(9);
+      doc.setTextColor.apply(doc, ink);
+      var fy = ty + 5;
+      doc.splitTextToSize(text, footColW).forEach(function(l){ doc.text(l, x, fy); fy += 4.4; });
+    }
+    footBlock(marginX, "Notes", state.notes);
+    footBlock(marginX + footColW + 12, "Terms", state.termsText);
+
+    return doc;
+  }
+
+  function filenameFor(){
+    return (state.meta.number || "invoice").replace(/[^\w.-]+/g, "_") + ".pdf";
+  }
+
+  function generateAndSavePdf(){
+    return loadImageAsDataUrl(currentLogoSrc()).then(function(logoDataUrl){
+      var doc = buildPdf(logoDataUrl);
+      doc.save(filenameFor());
+      recordToHistory();
+      return true;
+    });
+  }
+
+  el.downloadBtn.addEventListener("click", function(){
+    var statusText = el.statusLine.querySelector("span:last-child");
+    el.downloadBtn.disabled = true;
+    var originalLabel = el.downloadBtn.innerHTML;
+    el.downloadBtn.innerHTML = "⬇ Preparing…";
+    generateAndSavePdf().then(function(){
+      statusText.textContent = "Saved " + filenameFor() + " to your downloads.";
+    }).catch(function(e){
+      statusText.textContent = "Couldn't build the PDF (" + (e && e.message ? e.message : "unknown error") + "). Try again.";
+    }).finally(function(){
+      el.downloadBtn.disabled = false;
+      el.downloadBtn.innerHTML = originalLabel;
+    });
+  });
+
+  el.emailBtn.addEventListener("click", function(){
+    var statusText = el.statusLine.querySelector("span:last-child");
+    var to = (state.sendToEmail || state.client.email || "").trim();
+    if(!to){
+      statusText.textContent = "Add the client's email in the \"Email this invoice to\" field first.";
+      el.sendToEmail.focus();
+      return;
+    }
+    el.emailBtn.disabled = true;
+    var originalLabel = el.emailBtn.innerHTML;
+    el.emailBtn.innerHTML = "✉ Preparing…";
+    generateAndSavePdf().then(function(){
+      var t = computeTotals();
+      var subject = "Tax Invoice " + state.meta.number + " from " + (state.biz.name || "");
+      var body = "Dear " + (state.client.name || "Sir/Madam") + ",\n\n" +
+        "Please find attached tax invoice " + state.meta.number + " for " + fmt(t.total) + " (THB), due " + state.meta.due + ".\n\n" +
+        "The PDF has just downloaded to this computer as \"" + filenameFor() + "\" — please attach it to this email before sending.\n\n" +
+        "Thank you,\n" + (state.biz.name || "");
+      var mailto = "mailto:" + encodeURIComponent(to) + "?subject=" + encodeURIComponent(subject) + "&body=" + encodeURIComponent(body);
+      window.location.href = mailto;
+      el.statusLine.querySelector("span:last-child").textContent = "PDF downloaded and your email app is opening — attach " + filenameFor() + " before sending.";
+    }).catch(function(e){
+      el.statusLine.querySelector("span:last-child").textContent = "Couldn't build the PDF (" + (e && e.message ? e.message : "unknown error") + "). Try again.";
+    }).finally(function(){
+      el.emailBtn.disabled = false;
+      el.emailBtn.innerHTML = originalLabel;
+    });
+  });
+
+  // ---------- boot ----------
+  load();
+  bootFieldsFromState();
+  renderHistory();
+})();
+</script>
+</body>
+</html>
