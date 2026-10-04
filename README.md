@@ -8,7 +8,8 @@ A one-page, no-install invoicing tool for Ajmal Perfume Co., Ltd. It runs entire
 - Saves everything typed on that device automatically (browser local storage) — no login needed
 - Keeps a "Recent invoices" list on that device of every invoice downloaded or emailed
 - **Download PDF** — generates a print-ready tax invoice PDF
-- **Email to client** — downloads the PDF and opens the default email app with the client's address, subject and message pre-filled (the PDF must be attached manually — a plain webpage cannot attach files to an email on its own; see "Upgrading email" below if you want true one-click send)
+- **Email to client** — downloads the PDF and opens the default email app with the client's address, subject and message pre-filled (the PDF must be attached manually — a plain webpage cannot attach files to an email on its own; see "On EmailJS" below for why this stays as-is)
+- **Export backup / Import backup** — save the invoice history (and business profile) to a small `.json` file, and load it back in on any device/browser
 
 ## Files
 
@@ -53,11 +54,20 @@ Two ways to think about the choice long term:
 
 Paying for GitHub Pro just to keep the *repo* private while still using GitHub's own Pages hosting isn't worth it — Cloudflare's combination above gets you real access control for free.
 
-## Upgrading email later (optional)
+## On EmailJS
 
-To make **Email to client** send the PDF automatically (no manual attaching), wire up a free [EmailJS](https://www.emailjs.com) account:
-1. Sign up free at emailjs.com and connect an email address (Gmail, Outlook, etc.)
-2. Create an email template there for the invoice message
-3. In `index.html`, replace the `mailto:` line in the `emailBtn` click handler with an EmailJS `send()` call using your Service ID, Template ID and Public Key, and pass the generated PDF as a base64 attachment
+EmailJS was considered for one-click sending, but its **free plan does not support file attachments at all** — that's a paid-plan feature only (Personal, $9/month, attachments up to 500kb; higher tiers cost more). Since the whole point is sending the actual PDF, not just a text summary, the free `mailto:` approach above is the one that's actually free and does that. If attachments ever get added to EmailJS's free tier, or $9/month becomes acceptable, this is easy to swap in later.
 
-This isn't wired in by default since it needs your own EmailJS account and keys — happy to add it in if you'd like to set that account up.
+## Backing up and reloading invoice history
+
+The "Recent invoices" list is stored per browser (local storage), so it won't show up if you open the tool from a different computer, or after clearing that browser's data. To move it:
+
+1. On the computer with the invoices, click **Export backup** — downloads a `ajmal-invoice-backup_<date>.json` file containing the invoice history and saved business profile.
+2. Save that file somewhere you can get to from the other computer (Google Drive, Dropbox, a USB stick, email it to yourself).
+3. On the other computer, open the tool, click **Import backup**, and pick that file — it merges in, so importing the same file twice won't create duplicates.
+
+This costs nothing and needs no account. If this ever gets annoying to do by hand, the next step up (also free) is auto-logging every invoice to a Google Sheet via a small Google Apps Script — ask if you want that built in.
+
+## On the logo
+
+The current `assets/logo.png` (887×202px, transparent background) is plenty sharp at the sizes it's shown on screen and in the PDF (roughly a 64px box on screen, ~22mm in the PDF), so there's no need to replace it just for quality. If you do have the original vector file from whoever designed it (an `.svg`, `.ai`, or `.eps`), sending that over would make it crisp at any size — useful if this logo ever needs to go larger (e.g. on a printed letterhead or a bigger banner), but it's not needed for this tool to look right.

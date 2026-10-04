@@ -8,50 +8,50 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
   :root{
-    --app-bg:#f1eef7;
+    --app-bg:#eef0f3;
     --paper:#ffffff;
-    --ink:#1f1c2e;
-    --ink-muted:#7d7891;
-    --rule:#e3e0ec;
-    --rule-strong:#c9c5db;
-    --accent:#2a2568;
-    --accent-ink:#181449;
-    --accent-soft:#e9e7f5;
-    --danger:#b3452f;
-    --danger-soft:#f7e6e1;
-    --chip-bg:#eeecf7;
-    --shadow: 0 1px 2px rgba(31,28,46,.06), 0 12px 32px -16px rgba(31,28,46,.28);
+    --ink:#171631;
+    --ink-muted:#726f85;
+    --rule:#e2e1e8;
+    --rule-strong:#c7c5d2;
+    --accent:#140b4e;
+    --accent-ink:#0a0630;
+    --accent-soft:#edecf3;
+    --danger:#a8432e;
+    --danger-soft:#f6e7e2;
+    --chip-bg:#ecebf1;
+    --shadow: 0 1px 2px rgba(20,17,45,.06), 0 12px 32px -16px rgba(20,17,45,.26);
     --focus: 0 0 0 3px var(--accent-soft);
     color-scheme: light;
   }
   @media (prefers-color-scheme: dark){
     :root:not([data-theme="light"]){
-      --app-bg:#15131f;
-      --ink:#ece9f7;
-      --ink-muted:#a29cbd;
-      --rule:#332e4c;
-      --rule-strong:#453f66;
-      --accent:#8b85e6;
-      --accent-ink:#d7d3fa;
-      --accent-soft:#241f42;
-      --danger:#e0785f;
+      --app-bg:#131320;
+      --ink:#eae9f1;
+      --ink-muted:#a19eb3;
+      --rule:#322f44;
+      --rule-strong:#44415a;
+      --accent:#8d85e8;
+      --accent-ink:#d6d2f6;
+      --accent-soft:#201d36;
+      --danger:#dd775f;
       --danger-soft:#3a2019;
-      --chip-bg:#211d38;
+      --chip-bg:#1d1b2e;
       --shadow: 0 1px 2px rgba(0,0,0,.4), 0 20px 48px -20px rgba(0,0,0,.7);
     }
   }
   :root[data-theme="dark"]{
-    --app-bg:#15131f;
-    --ink:#ece9f7;
-    --ink-muted:#a29cbd;
-    --rule:#332e4c;
-    --rule-strong:#453f66;
-    --accent:#8b85e6;
-    --accent-ink:#d7d3fa;
-    --accent-soft:#241f42;
-    --danger:#e0785f;
+    --app-bg:#131320;
+    --ink:#eae9f1;
+    --ink-muted:#a19eb3;
+    --rule:#322f44;
+    --rule-strong:#44415a;
+    --accent:#8d85e8;
+    --accent-ink:#d6d2f6;
+    --accent-soft:#201d36;
+    --danger:#dd775f;
     --danger-soft:#3a2019;
-    --chip-bg:#211d38;
+    --chip-bg:#1d1b2e;
     --shadow: 0 1px 2px rgba(0,0,0,.4), 0 20px 48px -20px rgba(0,0,0,.7);
   }
 
@@ -112,35 +112,35 @@
     font-family:"Inter",sans-serif;color:#1f1c2e;background:transparent;
     border:none;outline:none;width:100%;padding:0;
   }
-  .sheet ::placeholder{color:#b3ade6;opacity:.55;}
+  .sheet ::placeholder{color:#b5b1c4;opacity:.55;}
 
-  .field-line{border-bottom:1px dashed #d9d4ee;padding-block:3px;}
+  .field-line{border-bottom:1px dashed #ddd9e2;padding-block:3px;}
   .field-line:focus-within{border-bottom-style:solid;border-bottom-color:var(--accent);}
 
   .head{display:flex;justify-content:space-between;gap:24px;flex-wrap:wrap;margin-bottom:26px;}
   .biz{display:flex;gap:14px;max-width:360px;}
   .logo-box{
-    flex:none;width:64px;height:64px;border-radius:10px;border:1.5px dashed #d3cdec;
+    flex:none;width:64px;height:64px;border-radius:10px;border:1.5px dashed #d8d4e0;
     display:flex;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;
-    background:#faf9fd;color:#a79fd1;text-align:center;font-size:10px;line-height:1.25;font-weight:600;
+    background:#f7f7f9;color:#8d8a9c;text-align:center;font-size:10px;line-height:1.25;font-weight:600;
   }
   .logo-box:hover{border-color:var(--accent);color:var(--accent-ink);}
   .logo-box img{width:100%;height:100%;object-fit:contain;}
   .biz-fields{display:flex;flex-direction:column;gap:3px;min-width:0;}
   .biz-fields input{font-size:14.5px;font-weight:700;font-family:"Fraunces",serif;}
-  .biz-fields textarea{font-size:12px;color:#615a7c;resize:none;overflow:hidden;line-height:1.45;}
+  .biz-fields textarea{font-size:12px;color:#5c5872;resize:none;overflow:hidden;line-height:1.45;}
   .biz-fields .small-row{display:flex;gap:8px;}
-  .biz-fields .small-row input{font-size:12px;color:#615a7c;font-weight:400;}
+  .biz-fields .small-row input{font-size:12px;color:#5c5872;font-weight:400;}
   .logo-remove{font-size:10.5px;color:var(--ink-muted);background:none;border:none;padding:2px 0;cursor:pointer;text-decoration:underline;text-underline-offset:2px;}
 
   .meta{text-align:right;min-width:220px;}
-  .meta .wordmark{font-size:22px;font-weight:800;letter-spacing:.01em;color:#161331;margin:0;}
-  .meta .wordmark-th{font-size:12px;font-weight:500;color:#8a83ad;margin:0 0 9px;font-family:"Inter",sans-serif;}
+  .meta .wordmark{font-size:22px;font-weight:800;letter-spacing:.01em;color:#140b4e;margin:0;}
+  .meta .wordmark-th{font-size:12px;font-weight:500;color:#827f94;margin:0 0 9px;font-family:"Inter",sans-serif;}
   .copy-toggle{display:inline-flex;border:1px solid var(--rule-strong);border-radius:7px;overflow:hidden;margin-bottom:9px;}
   .copy-toggle button{border:none;border-radius:0;padding:4px 10px;font-size:10.5px;background:var(--paper);color:var(--ink-muted);}
   .copy-toggle button.active{background:var(--accent);color:#fff;}
   .meta-row{display:flex;justify-content:flex-end;gap:8px;align-items:baseline;font-size:12.5px;margin-bottom:4px;}
-  .meta-row label{color:#8a83ad;flex:none;}
+  .meta-row label{color:#827f94;flex:none;}
   .meta-row input, .meta-row select{
     text-align:right;font-variant-numeric:tabular-nums;font-weight:600;font-size:12.5px;width:auto;min-width:96px;
   }
@@ -148,18 +148,18 @@
 
   .parties{display:flex;gap:30px;flex-wrap:wrap;margin-bottom:24px;}
   .party{flex:1 1 220px;min-width:220px;}
-  .party .label{font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:#a79fd1;font-weight:700;margin-bottom:7px;}
+  .party .label{font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:#8d8a9c;font-weight:700;margin-bottom:7px;}
   .party input{font-size:14px;font-weight:600;margin-bottom:3px;}
-  .party textarea{font-size:12px;color:#615a7c;resize:none;overflow:hidden;line-height:1.5;}
-  .party .subfield{font-size:11.5px !important;font-weight:400 !important;color:#8a83ad !important;margin-top:2px;}
+  .party textarea{font-size:12px;color:#5c5872;resize:none;overflow:hidden;line-height:1.5;}
+  .party .subfield{font-size:11.5px !important;font-weight:400 !important;color:#827f94 !important;margin-top:2px;}
 
   .items{width:100%;border-collapse:collapse;margin-bottom:4px;}
   .items thead th{
-    text-align:left;font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:#a79fd1;
+    text-align:left;font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:#8d8a9c;
     font-weight:700;padding-bottom:8px;border-bottom:1.5px solid #1f1c2e;
   }
   .items thead th.num{text-align:right;}
-  .items tbody td{padding-block:9px;border-bottom:1px solid #efecf9;vertical-align:top;}
+  .items tbody td{padding-block:9px;border-bottom:1px solid #eeedf2;vertical-align:top;}
   .items tbody tr:last-child td{border-bottom:1.5px solid #1f1c2e;}
   .items td.num input{text-align:right;font-variant-numeric:tabular-nums;}
   .items td.amount{text-align:right;font-variant-numeric:tabular-nums;font-weight:600;white-space:nowrap;padding-top:9px;}
@@ -168,33 +168,33 @@
   .items td.price{width:120px;}
   .items td.amount{width:110px;}
   .items td.rowctl{width:28px;padding-top:7px;}
-  .row-remove{background:none;border:none;color:#c7c1e3;cursor:pointer;padding:2px 4px;border-radius:5px;font-size:15px;line-height:1;}
+  .row-remove{background:none;border:none;color:#c7c4d2;cursor:pointer;padding:2px 4px;border-radius:5px;font-size:15px;line-height:1;}
   .row-remove:hover{color:var(--danger);background:var(--danger-soft);}
   .price-wrap{display:flex;align-items:center;justify-content:flex-end;gap:2px;white-space:nowrap;}
-  .money-prefix{color:#a79fd1;flex:none;}
+  .money-prefix{color:#8d8a9c;flex:none;}
 
   .add-line{margin-top:10px;font-size:12.5px;font-weight:600;color:var(--accent-ink);background:none;border:none;padding:4px 0;cursor:pointer;display:inline-flex;align-items:center;gap:5px;}
   .add-line:hover{text-decoration:underline;}
 
   .totals{display:flex;justify-content:flex-end;margin-top:22px;}
   .totals-box{width:270px;}
-  .totals-row{display:flex;justify-content:space-between;align-items:center;font-size:13px;padding-block:6px;color:#615a7c;}
+  .totals-row{display:flex;justify-content:space-between;align-items:center;font-size:13px;padding-block:6px;color:#5c5872;}
   .totals-row.vat-row label{display:flex;align-items:center;gap:6px;cursor:pointer;}
   .totals-row.vat-row input[type="checkbox"]{width:14px;height:14px;accent-color:var(--accent);cursor:pointer;}
-  .totals-row.vat-row .rate-input{width:34px;text-align:right;border-bottom:1px dashed #d9d4ee;font-variant-numeric:tabular-nums;}
+  .totals-row.vat-row .rate-input{width:34px;text-align:right;border-bottom:1px dashed #ddd9e2;font-variant-numeric:tabular-nums;}
   .totals-row .val{font-variant-numeric:tabular-nums;font-weight:600;color:#1f1c2e;}
   .totals-row.grand{border-top:1.5px solid #1f1c2e;margin-top:4px;padding-top:10px;font-size:16px;}
   .totals-row.grand .label{font-family:"Fraunces",serif;font-weight:700;color:#1f1c2e;}
   .totals-row.grand .val{font-family:"Fraunces",serif;font-size:19px;font-weight:700;color:var(--accent-ink);}
 
-  .foot{display:flex;gap:30px;flex-wrap:wrap;margin-top:32px;padding-top:20px;border-top:1px solid #efecf9;}
+  .foot{display:flex;gap:30px;flex-wrap:wrap;margin-top:32px;padding-top:20px;border-top:1px solid #eeedf2;}
   .foot .col{flex:1 1 240px;min-width:220px;}
-  .foot .label{font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:#a79fd1;font-weight:700;margin-bottom:7px;}
-  .foot textarea{font-size:12px;color:#615a7c;resize:none;overflow:hidden;line-height:1.55;min-height:40px;}
+  .foot .label{font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:#8d8a9c;font-weight:700;margin-bottom:7px;}
+  .foot textarea{font-size:12px;color:#5c5872;resize:none;overflow:hidden;line-height:1.55;min-height:40px;}
 
-  .email-row{display:flex;gap:8px;margin-top:26px;padding-top:18px;border-top:1px solid #efecf9;align-items:flex-end;flex-wrap:wrap;}
+  .email-row{display:flex;gap:8px;margin-top:26px;padding-top:18px;border-top:1px solid #eeedf2;align-items:flex-end;flex-wrap:wrap;}
   .email-row .field{flex:1 1 220px;min-width:200px;}
-  .email-row .label{font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:#a79fd1;font-weight:700;margin-bottom:7px;}
+  .email-row .label{font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:#8d8a9c;font-weight:700;margin-bottom:7px;}
   .email-row .field-line{padding-block:6px;}
 
   .hint{max-width:860px;margin:16px auto 0;font-size:12px;color:var(--ink-muted);line-height:1.55;display:flex;gap:8px;}
@@ -347,8 +347,16 @@
   <p class="hint"><span>💡</span><span><b>How this works:</b> fill in the sheet above — it's remembered on this device for next time. <b>Download PDF</b> saves a print-ready tax invoice straight to your downloads folder. <b>Email to client</b> downloads the PDF and opens your email app with the client's address and a message ready — just drag the PDF that downloaded into the email before sending, since a webpage on its own can't attach a file for you.</span></p>
 
   <div class="history">
-    <div class="history-head"><h2>Recent invoices</h2></div>
+    <div class="history-head">
+      <h2>Recent invoices</h2>
+      <div class="toolbar-actions">
+        <button class="ghost" id="importHistBtn" type="button" style="border:1px solid var(--rule-strong);">⇧ Import backup</button>
+        <button class="ghost" id="exportHistBtn" type="button" style="border:1px solid var(--rule-strong);">⇩ Export backup</button>
+        <input type="file" id="importHistInput" accept="application/json,.json">
+      </div>
+    </div>
     <div id="historyWrap"></div>
+    <p class="hint" style="margin:10px 2px 0;"><span>💾</span><span>This history lives only in this browser. To see it on another computer, click <b>Export backup</b> here, keep the file somewhere like Google Drive or Dropbox, then open this page on the other computer and click <b>Import backup</b>.</span></p>
   </div>
 </div>
 
@@ -366,7 +374,8 @@
    "vatEnabled","vatRate","notes","termsText","sendToEmail",
    "logoBox","logoInput","logoPlaceholder","logoRemoveBtn","copyToggle",
    "itemsBody","addLineBtn","downloadBtn","newInvoiceBtn","emailBtn","statusLine",
-   "subtotalVal","vatVal","totalVal","historyWrap"].forEach(function(id){ el[id] = document.getElementById(id); });
+   "subtotalVal","vatVal","totalVal","historyWrap",
+   "importHistBtn","exportHistBtn","importHistInput"].forEach(function(id){ el[id] = document.getElementById(id); });
 
   var fmt = function(n){
     n = Number(n) || 0;
@@ -634,6 +643,55 @@
   }
   function escapeHtml(s){ return String(s==null?"":s).replace(/[&<>"']/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]; }); }
 
+  // ---------- backup: export / import history across devices ----------
+  el.exportHistBtn.addEventListener("click", function(){
+    var list = loadHistory();
+    var payload = {
+      kind: "ajmal-invoice-backup",
+      exportedAt: new Date().toISOString(),
+      businessProfile: { biz: state.biz, logo: (typeof state.logo === "string") ? state.logo : null },
+      history: list
+    };
+    var blob = new Blob([JSON.stringify(payload, null, 2)], {type: "application/json"});
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement("a");
+    a.href = url;
+    a.download = "ajmal-invoice-backup_" + todayISO() + ".json";
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(function(){ URL.revokeObjectURL(url); }, 2000);
+    el.statusLine.querySelector("span:last-child").textContent = "Exported " + list.length + " invoice" + (list.length===1?"":"s") + " to a backup file.";
+  });
+
+  el.importHistBtn.addEventListener("click", function(){ el.importHistInput.click(); });
+  el.importHistInput.addEventListener("change", function(){
+    var file = el.importHistInput.files && el.importHistInput.files[0];
+    if(!file) return;
+    var reader = new FileReader();
+    reader.onload = function(){
+      var statusText = el.statusLine.querySelector("span:last-child");
+      try{
+        var payload = JSON.parse(reader.result);
+        var incoming = Array.isArray(payload.history) ? payload.history : (Array.isArray(payload) ? payload : null);
+        if(!incoming) throw new Error("not a recognised backup file");
+        var list = loadHistory();
+        var added = 0, updated = 0;
+        incoming.forEach(function(rec){
+          if(!rec || !rec.number) return;
+          var idx = list.findIndex(function(r){ return r.number === rec.number; });
+          if(idx >= 0){ list[idx] = rec; updated++; } else { list.unshift(rec); added++; }
+        });
+        list = list.slice(0, 200);
+        saveHistory(list);
+        renderHistory();
+        statusText.textContent = "Imported backup — " + added + " new, " + updated + " updated.";
+      }catch(e){
+        statusText.textContent = "Couldn't read that file as an invoice backup (" + (e && e.message ? e.message : "unknown error") + ").";
+      }
+      el.importHistInput.value = "";
+    };
+    reader.readAsText(file);
+  });
+
   // ---------- new invoice ----------
   el.newInvoiceBtn.addEventListener("click", function(){
     var current = state.meta.number || "AJ-INV-0000";
@@ -708,7 +766,7 @@
     var doc = new jsPDF({unit:"mm", format:"a4"});
     var pageW = 210, marginX = 18;
     var contentW = pageW - marginX*2;
-    var ink = [31,28,46], muted = [141,131,173], accent = [24,20,73], rule = [227,224,236];
+    var ink = [23,22,49], muted = [130,127,148], accent = [20,11,78], rule = [226,225,232];
     var y = 20;
 
     var textX = marginX;
