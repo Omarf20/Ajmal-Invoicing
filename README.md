@@ -14,11 +14,14 @@ A one-page, no-install invoicing tool for Ajmal Perfume Co., Ltd. It runs entire
 ## Files
 
 ```
-index.html       the whole app (open this in a browser to use it locally, no setup needed)
-assets/logo.png  the business logo shown by default (replace this file to change the default logo)
+index.html       the whole app — the default logo is baked directly into this file,
+                  so index.html alone is enough to deploy, nothing else required
+assets/logo.png  the original logo image, kept here for reference / backup only
 LICENSE          proprietary notice — see "Licensing" below
 .gitignore       keeps OS clutter and any future secret files out of the repo
 ```
+
+**Why the logo is baked in:** an earlier version loaded the logo from `assets/logo.png` as a separate file, but GitHub's drag-and-drop uploader doesn't reliably preserve folder structure — if `logo.png` lands anywhere other than exactly `assets/logo.png`, the page can't find it and falls back to the empty "Add logo" placeholder. Embedding the logo directly in `index.html` removes that whole failure mode: there's nothing to misplace, so it shows up correctly no matter how the files get uploaded. If you ever change the default logo, re-exporting through this tool's own logo upload (click the logo box) is the easiest way — it's remembered per browser from then on.
 
 ## Put it on GitHub Pages (free hosting)
 
