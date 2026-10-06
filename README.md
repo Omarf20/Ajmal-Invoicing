@@ -73,4 +73,12 @@ This costs nothing and needs no account. If this ever gets annoying to do by han
 
 ## On the logo
 
-The current `assets/logo.png` (887×202px, transparent background) is plenty sharp at the sizes it's shown on screen and in the PDF (roughly a 64px box on screen, ~22mm in the PDF), so there's no need to replace it just for quality. If you do have the original vector file from whoever designed it (an `.svg`, `.ai`, or `.eps`), sending that over would make it crisp at any size — useful if this logo ever needs to go larger (e.g. on a printed letterhead or a bigger banner), but it's not needed for this tool to look right.
+The default logo is now the round Ajmal Perfume emblem (the crown/seal mark), not the earlier horizontal wordmark version — it was swapped in because it reads better at small, square sizes (the logo box on screen and in the PDF is round). `assets/logo.png` holds this same image for reference; the page itself doesn't load that file (see "Why the logo is baked in" above), so replacing `assets/logo.png` alone won't change what's shown — use the logo box's own upload button for that, or ask to have a new one baked in as the default.
+
+The source image was 173×186px — on the small side for a logo, but clean enough at the sizes this tool shows it (a ~62px circle on screen, ~19mm in the PDF). If you get a higher-resolution or vector version (`.svg`, `.ai`, `.eps`) from whoever designed it, send it over and I'll bake in a crisper version.
+
+## On the invoice's design
+
+The layout follows the sample invoice template you shared (header with logo and invoice number/dates, a labelled "Bill to" / "Payable to" row, a solid-colour items table header, a highlighted grand total bar, thank-you note + terms, a signature line, and a footer contact strip) but restyled in Ajmal Perfume's own navy rather than the sample's blue, and adapted for a Thai tax invoice: bilingual "TAX INVOICE / ใบกำกับภาษี" heading, an Original/Copy marker, Tax ID fields for both business and client, and VAT instead of a generic tax line.
+
+One technical note: PDF text can only use fonts that are built into the file, and the base fonts (Helvetica/Times) don't include Thai characters or the ฿ symbol. To keep "ใบกำกับภาษี" readable in the PDF, a small Thai font (~20KB, Google's Noto Sans Thai) is embedded in `index.html`. Amounts in the PDF are written as "THB 1,234.00" rather than "฿1,234.00" for the same reason — the on-screen tool still shows ฿ normally, since browsers handle that fine.
