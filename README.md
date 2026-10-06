@@ -77,6 +77,8 @@ The default logo is now the round Ajmal Perfume emblem (the crown/seal mark), no
 
 The source image was 173×186px — on the small side for a logo, but clean enough at the sizes this tool shows it (a ~62px circle on screen, ~19mm in the PDF). If you get a higher-resolution or vector version (`.svg`, `.ai`, `.eps`) from whoever designed it, send it over and I'll bake in a crisper version.
 
+If a browser had an older custom logo uploaded through this tool before, it keeps using that logo (it's remembered per browser) even after this file is updated — click the small **"reset to default logo"** button under the logo box to clear it and go back to the round emblem. The PDF also now scales any logo (default or your own upload) to fit its box while keeping its real proportions, so a wide or tall logo won't come out stretched or squished anymore.
+
 ## On the invoice's design
 
 The layout follows the sample invoice template you shared (header with logo and invoice number/dates, a labelled "Bill to" / "Payable to" row, a solid-colour items table header, a highlighted grand total bar, thank-you note + terms, a signature line, and a footer contact strip) but restyled in Ajmal Perfume's own navy rather than the sample's blue, and adapted for a Thai tax invoice: bilingual "TAX INVOICE / ใบกำกับภาษี" heading, an Original/Copy marker, Tax ID fields for both business and client, and VAT instead of a generic tax line.

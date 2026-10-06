@@ -271,7 +271,7 @@
           <div class="logo-box" id="logoBox" title="Click to change logo">
             <span id="logoPlaceholder">Add<br>logo</span>
           </div>
-          <button class="logo-remove" id="logoRemoveBtn" type="button" hidden>remove logo</button>
+          <button class="logo-remove" id="logoRemoveBtn" type="button" hidden>reset to default logo</button>
           <input type="file" id="logoInput" accept="image/png,image/jpeg,image/webp,image/svg+xml">
         </div>
         <div class="biz-fields">
@@ -484,19 +484,18 @@ var FONT_THAI_B64 = "AAEAAAAQAQAABAAAR0RFRg+yDG4AAEF8AAABKEdQT1NPwI2qAABCpAAACRx
 
   // ---------- logo ----------
   function currentLogoSrc(){
-    if(state.logo === null) return null;
+    // state.logo is only ever a custom data URL (set by uploading a file) or
+    // unset. Anything else falls back to the built-in default logo — there is
+    // no "no logo at all" state, so a stale custom upload from an older
+    // version of this tool can always be cleared back to the current default
+    // via the "reset to default logo" button below.
     if(typeof state.logo === "string" && state.logo) return state.logo;
     return DEFAULT_LOGO;
   }
   function renderLogo(){
     var src = currentLogoSrc();
-    if(src){
-      el.logoBox.innerHTML = '<img src="'+src+'" alt="Business logo">';
-      el.logoRemoveBtn.hidden = false;
-    } else {
-      el.logoBox.innerHTML = '<span>Add<br>logo</span>';
-      el.logoRemoveBtn.hidden = true;
-    }
+    el.logoBox.innerHTML = '<img src="'+src+'" alt="Business logo">';
+    el.logoRemoveBtn.hidden = !(typeof state.logo === "string" && state.logo);
   }
   el.logoBox.addEventListener("click", function(){ el.logoInput.click(); });
   el.logoInput.addEventListener("change", function(){
@@ -507,7 +506,7 @@ var FONT_THAI_B64 = "AAEAAAAQAQAABAAAR0RFRg+yDG4AAEF8AAABKEdQT1NPwI2qAABCpAAACRx
     reader.readAsDataURL(file);
   });
   el.logoRemoveBtn.addEventListener("click", function(){
-    state.logo = null; el.logoInput.value = ""; renderLogo(); save();
+    state.logo = undefined; el.logoInput.value = ""; renderLogo(); save();
   });
 
   // ---------- copy/original toggle ----------
@@ -809,16 +808,21 @@ var FONT_THAI_B64 = "AAEAAAAQAQAABAAAR0RFRg+yDG4AAEF8AAABKEdQT1NPwI2qAABCpAAACRx
     return "PNG";
   }
   function loadImageAsDataUrl(src){
+    // Resolves {url, w, h} so the PDF can scale the logo to its real aspect
+    // ratio instead of forcing it into a square (which stretches a wide or
+    // tall logo).
     return new Promise(function(resolve){
-      if(src.indexOf("data:") === 0){ resolve(src); return; }
+      if(!src){ resolve(null); return; }
       var img = new Image();
       img.crossOrigin = "anonymous";
       img.onload = function(){
+        var w = img.naturalWidth || 1, h = img.naturalHeight || 1;
+        if(src.indexOf("data:") === 0){ resolve({url: src, w: w, h: h}); return; }
         try{
           var canvas = document.createElement("canvas");
-          canvas.width = img.naturalWidth; canvas.height = img.naturalHeight;
+          canvas.width = w; canvas.height = h;
           canvas.getContext("2d").drawImage(img, 0, 0);
-          resolve(canvas.toDataURL("image/png"));
+          resolve({url: canvas.toDataURL("image/png"), w: w, h: h});
         }catch(e){ resolve(null); }
       };
       img.onerror = function(){ resolve(null); };
@@ -826,7 +830,8 @@ var FONT_THAI_B64 = "AAEAAAAQAQAABAAAR0RFRg+yDG4AAEF8AAABKEdQT1NPwI2qAABCpAAACRx
     });
   }
 
-  function buildPdf(logoDataUrl){
+  function buildPdf(logo){
+    // logo is {url, w, h} from loadImageAsDataUrl(), or null/undefined.
     var jsPDF = window.jspdf.jsPDF;
     var doc = new jsPDF({unit:"mm", format:"a4"});
     try{
@@ -840,10 +845,19 @@ var FONT_THAI_B64 = "AAEAAAAQAQAABAAAR0RFRg+yDG4AAEF8AAABKEdQT1NPwI2qAABCpAAACRx
     var y = 18;
 
     var textX = marginX;
-    if(logoDataUrl){
+    if(logo && logo.url){
       try{
-        var fmtImg = dataUrlToImageFormat(logoDataUrl);
-        doc.addImage(logoDataUrl, fmtImg, marginX, y - 1, 19, 19, undefined, "FAST");
+        // Fit the logo inside a 19x19mm box, preserving its real aspect
+        // ratio (instead of forcing it into a square, which stretches any
+        // non-square logo), and center it within that box.
+        var box = 19;
+        var natW = logo.w || 1, natH = logo.h || 1;
+        var scale = Math.min(box / natW, box / natH);
+        var drawW = natW * scale, drawH = natH * scale;
+        var drawX = marginX + (box - drawW) / 2;
+        var drawY = (y - 1) + (box - drawH) / 2;
+        var fmtImg = dataUrlToImageFormat(logo.url);
+        doc.addImage(logo.url, fmtImg, drawX, drawY, drawW, drawH, undefined, "FAST");
         textX = marginX + 24;
       }catch(e){ textX = marginX; }
     }
@@ -1048,8 +1062,8 @@ var FONT_THAI_B64 = "AAEAAAAQAQAABAAAR0RFRg+yDG4AAEF8AAABKEdQT1NPwI2qAABCpAAACRx
   }
 
   function generateAndSavePdf(){
-    return loadImageAsDataUrl(currentLogoSrc()).then(function(logoDataUrl){
-      var doc = buildPdf(logoDataUrl);
+    return loadImageAsDataUrl(currentLogoSrc()).then(function(logo){
+      var doc = buildPdf(logo);
       doc.save(filenameFor());
       recordToHistory();
       return true;
